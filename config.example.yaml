@@ -1,0 +1,20 @@
+server:
+  host: 127.0.0.1
+  port: 3080
+
+storage:
+  db_path: ./data/soc.sqlite
+
+wazuh:
+  alerts_file: /var/ossec/logs/alerts/alerts.json
+  api:
+    enabled: false
+    base_url: https://127.0.0.1:55000
+    username_env: WAZUH_API_USERNAME
+    password_env: WAZUH_API_PASSWORD
+    reject_unauthorized: false
+
+dashboard:
+  default_range_hours: 24
+
+clients: []
