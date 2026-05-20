@@ -113,16 +113,46 @@ curl http://127.0.0.1:3080/api/soc/ingest-state | jq .
 
 ## Synchroniser Les Agents Wazuh
 
-Activer la configuration Wazuh API dans `config.yaml`, definir les identifiants
-dans l'environnement, puis appeler l'endpoint de synchronisation :
+Activer la configuration Wazuh API dans `config.yaml`.
 
-```bash
-curl -X POST http://127.0.0.1:3080/api/sync/wazuh/agents
+Option simple en dev, avec identifiants directement dans `config.yaml` :
+
+```yaml
+wazuh:
+  api:
+    enabled: true
+    base_url: https://127.0.0.1:55000
+    username: wazuh
+    password: changeme
+    reject_unauthorized: false
 ```
+
+Ne pas committer `config.yaml` avec de vrais identifiants. Le fichier est ignore
+par Git.
+
+Option environnement :
+
+```yaml
+wazuh:
+  api:
+    enabled: true
+    base_url: https://127.0.0.1:55000
+    username_env: WAZUH_API_USERNAME
+    password_env: WAZUH_API_PASSWORD
+    reject_unauthorized: false
+```
+
+Puis :
 
 ```bash
 export WAZUH_API_USERNAME=...
 export WAZUH_API_PASSWORD=...
+```
+
+Appeler ensuite l'endpoint de synchronisation :
+
+```bash
+curl -X POST http://127.0.0.1:3080/api/sync/wazuh/agents
 ```
 
 ## Stack

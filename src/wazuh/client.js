@@ -21,8 +21,8 @@ class WazuhClient {
   async authenticate() {
     if (this.token) return this.token;
 
-    const username = readEnv(this.config.username_env);
-    const password = readEnv(this.config.password_env);
+    const username = readCredential(this.config, "username", "username_env");
+    const password = readCredential(this.config, "password", "password_env");
     const credentials = Buffer.from(`${username}:${password}`).toString("base64");
     const response = await fetch(
       `${trimSlash(this.config.base_url)}/security/user/authenticate?raw=true`,
@@ -65,10 +65,20 @@ class WazuhClient {
   }
 }
 
-function readEnv(name) {
+function readCredential(config, directKey, envKey) {
+  if (config[directKey]) {
+    return config[directKey];
+  }
+
+  return readEnv(config[envKey], directKey);
+}
+
+function readEnv(name, label) {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`Missing required environment variable ${name}`);
+    throw new Error(
+      `Missing Wazuh API ${label}. Set wazuh.api.${label} in config.yaml or environment variable ${name}`
+    );
   }
   return value;
 }

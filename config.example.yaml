@@ -6,15 +6,20 @@ storage:
   db_path: ./data/soc.sqlite
 
 wazuh:
-  live_enabled: false
+  live_enabled: true
   alerts_file: /var/ossec/logs/alerts/alerts.json
   tail_start_from: end
   poll_interval_ms: 1000
   api:
     enabled: false
     base_url: https://127.0.0.1:55000
+    # Option 1: keep secrets in environment variables.
     username_env: WAZUH_API_USERNAME
     password_env: WAZUH_API_PASSWORD
+    # Option 2: set local credentials directly in config.yaml.
+    # Do not commit real credentials.
+    # username: wazuh
+    # password: changeme
     reject_unauthorized: false
 
 dashboard:
