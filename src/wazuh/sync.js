@@ -29,7 +29,7 @@ function normalizeAgent(agent, clientKey) {
     ip: agent.ip,
     os_name: agent.os?.name,
     status: normalizeStatus(agent.status),
-    last_seen: agent.lastKeepAlive || agent.dateAdd,
+    last_seen: normalizeLastSeen(agent),
     last_alert_at: null,
     alert_count: 0,
     max_severity: null,
@@ -43,4 +43,12 @@ function normalizeStatus(status) {
   if (status === "disconnected") return "disconnected";
   if (status === "never_connected") return "never_connected";
   return status || "unknown";
+}
+
+function normalizeLastSeen(agent) {
+  if (agent.id === "000" && String(agent.lastKeepAlive || "").startsWith("9999-")) {
+    return agent.dateAdd || null;
+  }
+
+  return agent.lastKeepAlive || agent.dateAdd || null;
 }

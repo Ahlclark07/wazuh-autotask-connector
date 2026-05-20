@@ -15,7 +15,7 @@ class WazuhClient {
   }
 
   async listAgents() {
-    return this.request("/agents?limit=10000&sort=lastKeepAlive:desc");
+    return this.request("/agents?limit=10000");
   }
 
   async authenticate() {
