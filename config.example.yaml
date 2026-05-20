@@ -6,7 +6,10 @@ storage:
   db_path: ./data/soc.sqlite
 
 wazuh:
+  live_enabled: false
   alerts_file: /var/ossec/logs/alerts/alerts.json
+  tail_start_from: end
+  poll_interval_ms: 1000
   api:
     enabled: false
     base_url: https://127.0.0.1:55000

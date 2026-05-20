@@ -15,6 +15,9 @@ export function openStore(dbPath) {
     close: () => db.close(),
     insertEvent: buildInsertEvent(db),
     upsertEndpoint: buildUpsertEndpoint(db),
+    getIngestState: buildGetIngestState(db),
+    listIngestStates: buildListIngestStates(db),
+    upsertIngestState: buildUpsertIngestState(db),
     getOverview: buildGetOverview(db),
     listEvents: buildListEvents(db),
     listEndpoints: buildListEndpoints(db),
@@ -70,6 +73,15 @@ function migrate(db) {
     CREATE INDEX IF NOT EXISTS idx_endpoints_client ON endpoints(client_key);
     CREATE INDEX IF NOT EXISTS idx_endpoints_status ON endpoints(status);
     CREATE INDEX IF NOT EXISTS idx_endpoints_last_seen ON endpoints(last_seen);
+
+    CREATE TABLE IF NOT EXISTS ingest_state (
+      source TEXT PRIMARY KEY,
+      file_path TEXT NOT NULL,
+      inode TEXT,
+      offset INTEGER NOT NULL DEFAULT 0,
+      partial_line TEXT,
+      updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+    );
   `);
 }
 
@@ -168,6 +180,54 @@ function buildUpsertEndpoint(db) {
   `);
 
   return (endpoint) => statement.run(toNullableRecord(endpoint));
+}
+
+function buildGetIngestState(db) {
+  const statement = db.prepare(`
+    SELECT *
+    FROM ingest_state
+    WHERE source = @source
+  `);
+
+  return (source) => statement.get({ source });
+}
+
+function buildListIngestStates(db) {
+  const statement = db.prepare(`
+    SELECT *
+    FROM ingest_state
+    ORDER BY updated_at DESC
+  `);
+
+  return () => statement.all();
+}
+
+function buildUpsertIngestState(db) {
+  const statement = db.prepare(`
+    INSERT INTO ingest_state (
+      source,
+      file_path,
+      inode,
+      offset,
+      partial_line,
+      updated_at
+    ) VALUES (
+      @source,
+      @file_path,
+      @inode,
+      @offset,
+      @partial_line,
+      strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+    )
+    ON CONFLICT(source) DO UPDATE SET
+      file_path = excluded.file_path,
+      inode = excluded.inode,
+      offset = excluded.offset,
+      partial_line = excluded.partial_line,
+      updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+  `);
+
+  return (state) => statement.run(toNullableRecord(state));
 }
 
 function buildGetOverview(db) {

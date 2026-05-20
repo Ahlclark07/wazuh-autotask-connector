@@ -20,7 +20,8 @@ export function createServer({ config, store, startedAt }) {
       mode: "observe-only",
       uptime_seconds: Math.round((Date.now() - startedAt.getTime()) / 1000),
       started_at: startedAt.toISOString(),
-      db_path: config.storage.db_path
+      db_path: config.storage.db_path,
+      wazuh_live_enabled: Boolean(config.wazuh.live_enabled)
     });
   });
 
@@ -58,6 +59,12 @@ export function createServer({ config, store, startedAt }) {
   app.get("/api/soc/sources", (req, res) => {
     res.json({
       items: store.listSourceSummaries(getRangeHours(req.query, config))
+    });
+  });
+
+  app.get("/api/soc/ingest-state", (_req, res) => {
+    res.json({
+      items: store.listIngestStates()
     });
   });
 
