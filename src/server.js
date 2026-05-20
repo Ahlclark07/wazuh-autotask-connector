@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 import { ingestAlert } from "./soc/ingest.js";
 import { createWazuhClient } from "./wazuh/client.js";
 import { syncWazuhAgents } from "./wazuh/sync.js";
@@ -6,6 +7,7 @@ import { syncWazuhAgents } from "./wazuh/sync.js";
 export function createServer({ config, store, startedAt }) {
   const app = express();
 
+  app.use(morgan("dev"));
   app.use(express.json({ limit: "2mb" }));
   app.use((_req, res, next) => {
     res.setHeader("cache-control", "no-store");
