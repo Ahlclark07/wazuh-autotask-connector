@@ -1,21 +1,22 @@
 # Wazuh Autotask Connector
 
-SOC visibility API for Wazuh data, with Autotask ticketing planned after the
-dashboard data model is stable.
+API SOC en JavaScript pour centraliser les données Wazuh avant de brancher la
+création de tickets Autotask.
 
-## Current Scope
+## Périmètre Actuel
 
-The first milestone is observe-only:
+Le premier jalon est en mode observation uniquement :
 
-- ingest normalized Wazuh alerts from `alerts.json`
-- store SOC events in SQLite
-- keep an endpoint inventory table
-- expose dashboard-friendly JSON endpoints
-- optionally sync Wazuh agents from the Wazuh Server API
+- ingérer les alertes Wazuh normalisées depuis `alerts.json`
+- stocker les événements SOC dans SQLite
+- maintenir une table d'endpoints
+- exposer des endpoints JSON utilisables par un dashboard
+- synchroniser optionnellement les agents via la Wazuh Server API
 
-Ticket creation is intentionally not implemented yet.
+La création de tickets Autotask n'est pas encore implémentée volontairement.
+On stabilise d'abord le modèle dashboard/SOC.
 
-## Setup
+## Installation
 
 ```bash
 npm install
@@ -24,7 +25,7 @@ npm run ingest:sample
 npm start
 ```
 
-API default:
+API par défaut :
 
 ```text
 http://127.0.0.1:3080
@@ -43,18 +44,19 @@ POST /api/ingest/alert
 POST /api/sync/wazuh/agents
 ```
 
-## Data Sources
+## Sources De Données
 
-Use `alerts.json` for SOC events:
+Utiliser `alerts.json` pour le flux d'événements SOC :
 
 ```text
 /var/ossec/logs/alerts/alerts.json
 ```
 
-This gives the dashboard alert volume, severity, source, client mapping,
-affected endpoint, and notable event stream.
+Ce fichier sert au dashboard pour le volume d'alertes, les sévérités, les
+sources, le mapping client, les endpoints touchés et le flux des événements
+notables. Il ne sert pas uniquement à créer des tickets.
 
-Use the Wazuh Server API for endpoint state:
+Utiliser la Wazuh Server API pour l'état des endpoints :
 
 ```text
 GET /agents
@@ -68,19 +70,19 @@ GET /syscollector/{agent_id}/ports
 GET /syscollector/{agent_id}/services
 ```
 
-Use the Wazuh indexer later for heavier historical queries and vulnerability
-state, if direct API calls become too slow for the dashboard.
+Utiliser le Wazuh indexer plus tard pour les recherches historiques lourdes,
+les vulnérabilités et les analytics si les appels directs deviennent trop lents.
 
-## Ingest Existing Alerts
+## Ingérer Des Alertes Existantes
 
 ```bash
 npm run ingest:file -- /var/ossec/logs/alerts/alerts.json
 ```
 
-## Sync Wazuh Agents
+## Synchroniser Les Agents Wazuh
 
-Enable the Wazuh API config in `config.yaml`, set credentials in environment
-variables, then call:
+Activer la configuration Wazuh API dans `config.yaml`, définir les identifiants
+dans l'environnement, puis appeler l'endpoint de synchronisation :
 
 ```bash
 curl -X POST http://127.0.0.1:3080/api/sync/wazuh/agents
@@ -90,3 +92,11 @@ curl -X POST http://127.0.0.1:3080/api/sync/wazuh/agents
 export WAZUH_API_USERNAME=...
 export WAZUH_API_PASSWORD=...
 ```
+
+## Stack
+
+- Node.js 20+
+- JavaScript pur
+- Express pour l'API HTTP
+- SQLite via `better-sqlite3`
+- YAML pour la configuration

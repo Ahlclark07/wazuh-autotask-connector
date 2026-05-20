@@ -1,7 +1,7 @@
 {
   "name": "wazuh-autotask-connector",
   "version": "0.1.0",
-  "description": "SOC visibility API for Wazuh alerts and future Autotask ticketing.",
+  "description": "API SOC pour les alertes Wazuh et le futur ticketing Autotask.",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
+    "express": "^5.2.1",
     "undici": "^7.10.0",
     "yaml": "^2.7.1"
   }
