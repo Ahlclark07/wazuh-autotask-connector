@@ -143,7 +143,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 prompt
-scripts
 test
 
 # Local connector runtime files
